@@ -47,13 +47,7 @@ const MENU_META = {
     "buttery",
   ],
 
-  times: [
-    "morning",
-    "afternoon",
-    "evening",
-    "night",
-    "any",
-  ],
+  times: ["morning", "afternoon", "evening", "night", "any"],
 };
 
 /* ---------- Types ---------- */
@@ -65,9 +59,7 @@ type Reply = {
 
 /* ---------- Helpers ---------- */
 function labelize(value: string) {
-  return value
-    .replace("-", " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase());
+  return value.replace("-", " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 export default function Chat() {
@@ -84,10 +76,10 @@ export default function Chat() {
       setLoading(true);
       setReply(null);
 
-      const res = await axios.post("http://localhost:8000/chat", {
-        mood,       // exact menu key
-        taste,      // exact menu key
-        time,       // exact menu key
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/chat`, {
+        mood,
+        taste,
+        time,
         temperature: "cold",
         caffeine: "medium",
       });
@@ -112,9 +104,7 @@ export default function Chat() {
           <div className="flex justify-center">
             <Coffee className="w-8 h-8 text-amber-400" />
           </div>
-          <h1 className="text-2xl font-bold text-white">
-            AI Coffee Barista
-          </h1>
+          <h1 className="text-2xl font-bold text-white">AI Coffee Barista</h1>
           <p className="text-sm text-zinc-400">
             Your perfect cup, intelligently brewed ☕
           </p>
@@ -122,11 +112,7 @@ export default function Chat() {
 
         {/* Mood */}
         <Section title="How are you feeling?">
-          <ChipGroup
-            items={MENU_META.moods}
-            value={mood}
-            onChange={setMood}
-          />
+          <ChipGroup items={MENU_META.moods} value={mood} onChange={setMood} />
         </Section>
 
         {/* Taste */}
@@ -188,13 +174,9 @@ export default function Chat() {
               <h3 className="text-lg font-semibold text-amber-400">
                 ☕ {reply.recommendation}
               </h3>
-              <p className="text-zinc-300 text-sm">
-                {reply.reason}
-              </p>
+              <p className="text-zinc-300 text-sm">{reply.reason}</p>
               {reply.price && (
-                <p className="text-white font-medium">
-                  ₹{reply.price}
-                </p>
+                <p className="text-white font-medium">₹{reply.price}</p>
               )}
             </motion.div>
           )}
