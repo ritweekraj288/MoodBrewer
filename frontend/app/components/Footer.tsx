@@ -98,7 +98,7 @@ export default function Footer() {
         {/* Bottom Section */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <p className="text-[#F5E6D3]/60 text-sm text-center md:text-left">
-            © 2024 MoodBrewer. All rights reserved. Crafted with{" "}
+            © 2025 MoodBrewer. All rights reserved. Crafted with{" "}
             <span className="text-[#D4AF37]">♥</span> and caffeine.
           </p>
 
