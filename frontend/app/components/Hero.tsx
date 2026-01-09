@@ -59,7 +59,7 @@ export default function Hero() {
           transition={{ duration: 0.8, delay: 0.4 }}
           className="text-xl text-[#F5E6D3]/70 max-w-2xl mx-auto leading-relaxed"
         >
-          Let our AI barista craft the perfect coffee and snack pairing based on
+          Let our AI barista craft the perfect coffee and snack based on
           your mood, taste preferences, and time of day. Experience personalized
           coffee curation like never before.
         </motion.p>
@@ -73,7 +73,7 @@ export default function Hero() {
           <Coffee className="w-5 h-5 text-[#D4AF37]" />
           <div className="h-px w-16 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent" />
           <span className="text-[#F5E6D3]/50 text-sm tracking-widest uppercase">
-            Since 2024
+            Since 2025
           </span>
           <div className="h-px w-16 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent" />
           <Coffee className="w-5 h-5 text-[#D4AF37]" />
