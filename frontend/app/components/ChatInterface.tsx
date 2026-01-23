@@ -3,9 +3,8 @@
 import { useState } from "react";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, Loader2, Clock, Heart, Coffee, Thermometer, Zap } from "lucide-react";
+import { Loader2, Clock, Brain, Coffee, Thermometer, Zap, ChevronRight } from "lucide-react";
 
-/* ---------- Hard-coded MENU META ---------- */
 const MENU_META = {
   moods: [
     "focused",
@@ -21,7 +20,6 @@ const MENU_META = {
     "snack",
     "meal",
   ],
-
   tastes: [
     "bold",
     "strong",
@@ -46,18 +44,15 @@ const MENU_META = {
     "herb",
     "buttery",
   ],
-
   times: ["morning", "afternoon", "evening", "night", "any"],
 };
 
-/* ---------- Types ---------- */
 type Reply = {
   recommendation: string;
   reason: string;
   price?: number;
 };
 
-/* ---------- Helpers ---------- */
 function labelize(value: string) {
   return value.replace("-", " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
@@ -74,7 +69,7 @@ export default function ChatInterface() {
 
   async function send() {
     if (!mood || !taste) {
-      setError("Please select both mood and taste preferences");
+      setError("Select mood and taste preferences");
       return;
     }
 
@@ -97,7 +92,7 @@ export default function ChatInterface() {
       console.error(err);
       setError(
         err.response?.data?.detail || 
-        "Unable to connect to the server. Please ensure the backend is running."
+        "Connection error. Ensure backend is running."
       );
     } finally {
       setLoading(false);
@@ -105,65 +100,72 @@ export default function ChatInterface() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-12">
+    <div className="max-w-5xl mx-auto px-6 py-20">
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        className="text-center mb-16"
+      >
+        <div className="inline-flex items-center gap-2 mb-6">
+          <Brain className="w-5 h-5 text-[#D97706]" />
+          <span className="text-sm text-[#E8E3DE]/60 uppercase tracking-wider">
+            AI Recommendation Engine
+          </span>
+        </div>
+        <h2 className="text-5xl md:text-6xl font-bold text-[#FAF5F0] mb-4">
+          Configure Your
+          <br />
+          <span className="text-[#D97706]">Preference Matrix</span>
+        </h2>
+        <p className="text-lg text-[#E8E3DE]/60 max-w-2xl mx-auto">
+          Define your parameters. Our algorithm will compute the optimal match.
+        </p>
+      </motion.div>
+
+      {/* Main Interface */}
       <motion.div
         initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="relative backdrop-blur-2xl bg-gradient-to-br from-[#592720]/40 via-[#3D2B1F]/40 to-[#592720]/40 border-2 border-[#D4AF37]/20 rounded-3xl shadow-2xl shadow-[#D4AF37]/10 p-8 md:p-10 space-y-8"
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        className="bg-[#1A1A1A] border border-[#D97706]/20 rounded-sm p-8 md:p-12 space-y-12"
       >
-        {/* Decorative Corner Elements */}
-        <div className="absolute top-0 left-0 w-20 h-20 border-t-2 border-l-2 border-[#D4AF37]/40 rounded-tl-3xl" />
-        <div className="absolute bottom-0 right-0 w-20 h-20 border-b-2 border-r-2 border-[#D4AF37]/40 rounded-br-3xl" />
-
-        {/* Header */}
-        <div className="text-center space-y-3">
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.2, type: "spring" }}
-            className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[#D4AF37] to-[#926644] rounded-2xl shadow-lg shadow-[#D4AF37]/30 mx-auto"
-          >
-            <Coffee className="w-8 h-8 text-[#1A1110]" strokeWidth={2.5} />
-          </motion.div>
-          <h2 className="text-3xl md:text-4xl font-bold text-[#F5E6D3]">
-            Your Perfect Cup Awaits
-          </h2>
-          <p className="text-[#F5E6D3]/60 text-lg">
-            Share your mood and let our AI barista find your match
-          </p>
-        </div>
-
         {/* Mood Section */}
-        <Section title="How are you feeling?" icon={<Heart className="w-4 h-4" />}>
+        <Section 
+          title="01. MOOD STATE" 
+          subtitle="Current emotional context"
+          icon={<Brain className="w-5 h-5" />}
+        >
           <ChipGroup items={MENU_META.moods} value={mood} onChange={setMood} />
         </Section>
 
         {/* Taste Section */}
-        <Section
-          title="Taste preference"
-          icon={<Coffee className="w-4 h-4" />}
+        <Section 
+          title="02. TASTE PROFILE" 
+          subtitle="Flavor preference"
+          icon={<Coffee className="w-5 h-5" />}
         >
-          <ChipGroup
-            items={MENU_META.tastes}
-            value={taste}
-            onChange={setTaste}
-          />
+          <ChipGroup items={MENU_META.tastes} value={taste} onChange={setTaste} />
         </Section>
 
         {/* Time Section */}
-        <Section title="Time of day" icon={<Clock className="w-4 h-4" />}>
-          <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
+        <Section 
+          title="03. TEMPORAL CONTEXT" 
+          subtitle="Time of day"
+          icon={<Clock className="w-5 h-5" />}
+        >
+          <div className="grid grid-cols-5 gap-3">
             {MENU_META.times.map((t) => (
               <motion.button
                 key={t}
                 onClick={() => setTime(t)}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className={`py-3 px-4 rounded-xl font-medium text-sm transition-all duration-300 ${
+                whileHover={{ scale: 1.02, y: -2 }}
+                whileTap={{ scale: 0.98 }}
+                className={`py-4 px-6 rounded-sm font-medium text-sm transition-all duration-200 uppercase tracking-wide ${
                   time === t
-                    ? "bg-[#D4AF37] text-[#1A1110] shadow-lg shadow-[#D4AF37]/30 border-2 border-[#D4AF37]"
-                    : "bg-[#592720]/30 border-2 border-[#D4AF37]/20 text-[#F5E6D3] hover:border-[#D4AF37]/50 hover:bg-[#592720]/50"
+                    ? "bg-[#D97706] text-[#0A0A0A] border border-[#D97706]"
+                    : "bg-[#2A2A2A] border border-[#D97706]/20 text-[#E8E3DE] hover:border-[#D97706]/40"
                 }`}
               >
                 {labelize(t)}
@@ -172,47 +174,56 @@ export default function ChatInterface() {
           </div>
         </Section>
 
-        {/* Temperature Section */}
-        <Section title="Temperature preference" icon={<Thermometer className="w-4 h-4" />}>
-          <div className="grid grid-cols-2 gap-3 max-w-md">
-            {["hot", "cold"].map((temp) => (
-              <motion.button
-                key={temp}
-                onClick={() => setTemperature(temp)}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className={`py-3 px-6 rounded-xl font-medium text-sm transition-all duration-300 ${
-                  temperature === temp
-                    ? "bg-[#D4AF37] text-[#1A1110] shadow-lg shadow-[#D4AF37]/30 border-2 border-[#D4AF37]"
-                    : "bg-[#592720]/30 border-2 border-[#D4AF37]/20 text-[#F5E6D3] hover:border-[#D4AF37]/50 hover:bg-[#592720]/50"
-                }`}
-              >
-                {labelize(temp)}
-              </motion.button>
-            ))}
-          </div>
-        </Section>
+        {/* Temperature & Caffeine */}
+        <div className="grid md:grid-cols-2 gap-8">
+          <Section 
+            title="04. TEMPERATURE" 
+            subtitle="Serving preference"
+            icon={<Thermometer className="w-5 h-5" />}
+          >
+            <div className="grid grid-cols-2 gap-3">
+              {["hot", "cold"].map((temp) => (
+                <motion.button
+                  key={temp}
+                  onClick={() => setTemperature(temp)}
+                  whileHover={{ scale: 1.02, y: -2 }}
+                  whileTap={{ scale: 0.98 }}
+                  className={`py-4 px-6 rounded-sm font-medium text-sm transition-all duration-200 uppercase tracking-wide ${
+                    temperature === temp
+                      ? "bg-[#D97706] text-[#0A0A0A] border border-[#D97706]"
+                      : "bg-[#2A2A2A] border border-[#D97706]/20 text-[#E8E3DE] hover:border-[#D97706]/40"
+                  }`}
+                >
+                  {labelize(temp)}
+                </motion.button>
+              ))}
+            </div>
+          </Section>
 
-        {/* Caffeine Section */}
-        <Section title="Caffeine level" icon={<Zap className="w-4 h-4" />}>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl">
-            {["none", "low", "medium", "high"].map((caf) => (
-              <motion.button
-                key={caf}
-                onClick={() => setCaffeine(caf)}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className={`py-3 px-4 rounded-xl font-medium text-sm transition-all duration-300 ${
-                  caffeine === caf
-                    ? "bg-[#D4AF37] text-[#1A1110] shadow-lg shadow-[#D4AF37]/30 border-2 border-[#D4AF37]"
-                    : "bg-[#592720]/30 border-2 border-[#D4AF37]/20 text-[#F5E6D3] hover:border-[#D4AF37]/50 hover:bg-[#592720]/50"
-                }`}
-              >
-                {labelize(caf)}
-              </motion.button>
-            ))}
-          </div>
-        </Section>
+          <Section 
+            title="05. CAFFEINE LEVEL" 
+            subtitle="Stimulant requirement"
+            icon={<Zap className="w-5 h-5" />}
+          >
+            <div className="grid grid-cols-4 gap-2">
+              {["none", "low", "medium", "high"].map((caf) => (
+                <motion.button
+                  key={caf}
+                  onClick={() => setCaffeine(caf)}
+                  whileHover={{ scale: 1.02, y: -2 }}
+                  whileTap={{ scale: 0.98 }}
+                  className={`py-4 px-3 rounded-sm font-medium text-xs transition-all duration-200 uppercase tracking-wide ${
+                    caffeine === caf
+                      ? "bg-[#D97706] text-[#0A0A0A] border border-[#D97706]"
+                      : "bg-[#2A2A2A] border border-[#D97706]/20 text-[#E8E3DE] hover:border-[#D97706]/40"
+                  }`}
+                >
+                  {labelize(caf)}
+                </motion.button>
+              ))}
+            </div>
+          </Section>
+        </div>
 
         {/* Error Message */}
         <AnimatePresence>
@@ -221,7 +232,7 @@ export default function ChatInterface() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="bg-red-500/20 border-2 border-red-500/50 rounded-xl p-4 text-red-200 text-sm"
+              className="bg-[#2A1A0A] border border-[#D97706]/40 rounded-sm p-4 text-[#D97706] text-sm"
             >
               {error}
             </motion.div>
@@ -232,81 +243,64 @@ export default function ChatInterface() {
         <motion.button
           onClick={send}
           disabled={loading || !mood || !taste}
-          whileHover={{ scale: loading ? 1 : 1.02 }}
-          whileTap={{ scale: loading ? 1 : 0.98 }}
-          className="w-full bg-gradient-to-r from-[#D4AF37] via-[#926644] to-[#D4AF37] text-[#1A1110] font-bold text-lg py-4 rounded-xl flex items-center justify-center gap-3 hover:shadow-2xl hover:shadow-[#D4AF37]/40 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group"
+          whileHover={{ scale: loading ? 1 : 1.01 }}
+          whileTap={{ scale: loading ? 1 : 0.99 }}
+          className="w-full bg-[#D97706] text-[#0A0A0A] font-bold text-lg py-5 rounded-sm flex items-center justify-center gap-3 hover:bg-[#F59E0B] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider"
         >
-          {/* Animated background gradient */}
-          <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-[#926644] via-[#D4AF37] to-[#926644] opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-            animate={{
-              backgroundPosition: ["0%", "100%"],
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              repeatType: "reverse",
-            }}
-            style={{
-              backgroundSize: "200% 100%",
-            }}
-          />
-          <span className="relative z-10 flex items-center gap-3">
-            {loading ? (
-              <>
-                <Loader2 className="animate-spin w-6 h-6" />
-                <span>Crafting Your Perfect Cup...</span>
-              </>
-            ) : (
-              <>
-                <Sparkles className="w-6 h-6" />
-                <span>Get My Recommendation</span>
-              </>
-            )}
-          </span>
+          {loading ? (
+            <>
+              <Loader2 className="animate-spin w-5 h-5" />
+              <span>Processing...</span>
+            </>
+          ) : (
+            <>
+              <span>Compute Recommendation</span>
+              <ChevronRight className="w-5 h-5" />
+            </>
+          )}
         </motion.button>
 
         {/* Response Card */}
         <AnimatePresence>
           {reply && (
             <motion.div
-              initial={{ opacity: 0, y: 30, scale: 0.9 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -30, scale: 0.9 }}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -30 }}
               transition={{ type: "spring", duration: 0.6 }}
-              className="relative mt-8"
+              className="mt-8 border-t border-[#D97706]/20 pt-8"
             >
-              {/* Glow Effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-[#D4AF37]/20 via-[#926644]/20 to-[#D4AF37]/20 rounded-2xl blur-xl" />
-              
-              {/* Card Content */}
-              <div className="relative bg-gradient-to-br from-[#3D2B1F] via-[#592720] to-[#3D2B1F] border-2 border-[#D4AF37] rounded-2xl p-8 shadow-2xl shadow-[#D4AF37]/20">
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-14 h-14 bg-[#D4AF37] rounded-xl flex items-center justify-center shadow-lg">
-                    <Coffee className="w-7 h-7 text-[#1A1110]" strokeWidth={2.5} />
+              <div className="bg-[#2A2A2A] border border-[#D97706]/30 rounded-sm p-8">
+                <div className="flex items-start gap-6">
+                  <div className="flex-shrink-0 w-12 h-12 bg-[#D97706] rounded-sm flex items-center justify-center">
+                    <Coffee className="w-6 h-6 text-[#0A0A0A]" strokeWidth={1.5} />
                   </div>
-                  <div className="flex-1 space-y-3">
-                    <h3 className="text-2xl md:text-3xl font-bold text-[#D4AF37]">
-                      {reply.recommendation}
-                    </h3>
-                    <p className="text-[#F5E6D3]/80 text-base md:text-lg leading-relaxed">
+                  <div className="flex-1 space-y-4">
+                    <div>
+                      <div className="text-xs text-[#D97706] uppercase tracking-wider mb-2">
+                        Recommended
+                      </div>
+                      <h3 className="text-3xl md:text-4xl font-bold text-[#FAF5F0] mb-3">
+                        {reply.recommendation}
+                      </h3>
+                    </div>
+                    <p className="text-[#E8E3DE]/80 text-base leading-relaxed">
                       {reply.reason}
                     </p>
                     {reply.price && (
-                      <div className="flex items-center gap-2 pt-2">
-                        <div className="h-px flex-1 bg-gradient-to-r from-[#D4AF37]/50 to-transparent" />
-                        <p className="text-2xl font-bold text-[#D4AF37]">
-                          ₹{reply.price}
-                        </p>
-                        <div className="h-px flex-1 bg-gradient-to-l from-[#D4AF37]/50 to-transparent" />
+                      <div className="pt-4 border-t border-[#D97706]/20">
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-sm text-[#E8E3DE]/60 uppercase tracking-wider">
+                            Price
+                          </span>
+                          <span className="text-2xl font-bold text-[#D97706]">
+                            ₹{reply.price}
+                          </span>
+                        </div>
                       </div>
                     )}
                   </div>
                 </div>
-
-                {/* Decorative Corner Accents */}
-                <div className="absolute top-2 right-2 w-8 h-8 border-t-2 border-r-2 border-[#D4AF37]/50 rounded-tr-lg" />
-                <div className="absolute bottom-2 left-2 w-8 h-8 border-b-2 border-l-2 border-[#D4AF37]/50 rounded-bl-lg" />
               </div>
             </motion.div>
           )}
@@ -316,25 +310,30 @@ export default function ChatInterface() {
   );
 }
 
-/* ---------- Small Components ---------- */
-
 function Section({
   title,
+  subtitle,
   icon,
   children,
 }: {
   title: string;
+  subtitle?: string;
   icon: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <div className="text-[#D4AF37]">{icon}</div>
-        <h3 className="text-lg font-semibold text-[#F5E6D3] tracking-wide">
-          {title}
-        </h3>
-        <div className="flex-1 h-px bg-gradient-to-r from-[#D4AF37]/30 to-transparent" />
+      <div className="flex items-center gap-3 mb-6">
+        <div className="text-[#D97706]">{icon}</div>
+        <div>
+          <h3 className="text-sm font-bold text-[#FAF5F0] uppercase tracking-wider">
+            {title}
+          </h3>
+          {subtitle && (
+            <p className="text-xs text-[#E8E3DE]/50 mt-1">{subtitle}</p>
+          )}
+        </div>
+        <div className="flex-1 h-px bg-gradient-to-r from-[#D97706]/20 to-transparent ml-4" />
       </div>
       {children}
     </div>
@@ -356,26 +355,18 @@ function ChipGroup({
         <motion.button
           key={item}
           onClick={() => onChange(item)}
-          initial={{ opacity: 0, scale: 0.8 }}
+          initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: index * 0.02, type: "spring", stiffness: 200 }}
-          whileHover={{ scale: 1.05, y: -2 }}
-          whileTap={{ scale: 0.95 }}
-          className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 relative overflow-hidden ${
+          transition={{ delay: index * 0.01 }}
+          whileHover={{ scale: 1.02, y: -2 }}
+          whileTap={{ scale: 0.98 }}
+          className={`px-5 py-2.5 rounded-sm text-sm font-medium transition-all duration-200 uppercase tracking-wide ${
             value === item
-              ? "bg-[#F5E6D3] text-[#1A1110] shadow-lg shadow-[#F5E6D3]/20 border-2 border-[#F5E6D3]"
-              : "bg-[#592720]/30 border-2 border-[#D4AF37]/20 text-[#F5E6D3] hover:border-[#D4AF37]/50 hover:bg-[#592720]/50"
+              ? "bg-[#D97706] text-[#0A0A0A] border border-[#D97706]"
+              : "bg-[#2A2A2A] border border-[#D97706]/20 text-[#E8E3DE] hover:border-[#D97706]/40"
           }`}
         >
-          {value === item && (
-            <motion.div
-              layoutId="selectedChip"
-              className="absolute inset-0 bg-[#F5E6D3] rounded-full"
-              initial={false}
-              transition={{ type: "spring", stiffness: 500, damping: 30 }}
-            />
-          )}
-          <span className="relative z-10">{labelize(item)}</span>
+          {labelize(item)}
         </motion.button>
       ))}
     </div>

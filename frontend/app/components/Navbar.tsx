@@ -1,111 +1,80 @@
 "use client";
 
-import { Coffee, Menu, X } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Coffee } from "lucide-react";
+import { motion } from "framer-motion";
 import { useState } from "react";
 
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  if (typeof window !== "undefined") {
+    window.addEventListener("scroll", () => {
+      setIsScrolled(window.scrollY > 20);
+    });
+  }
 
   const navItems = [
-    { name: "Home", href: "#" },
+    { name: "Discover", href: "#" },
     { name: "Menu", href: "#menu" },
     { name: "About", href: "#about" },
-    { name: "Contact", href: "#contact" },
   ];
 
   return (
     <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-[#1A1110]/80 border-b border-[#D4AF37]/20"
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled
+          ? "bg-[#0A0A0A]/95 backdrop-blur-xl border-b border-[#D97706]/10"
+          : "bg-transparent"
+      }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <motion.div
-            whileHover={{ scale: 1.05 }}
-            className="flex items-center gap-3 cursor-pointer"
+            whileHover={{ scale: 1.02 }}
+            className="flex items-center gap-3 cursor-pointer group"
           >
             <div className="relative">
-              <Coffee className="w-8 h-8 text-[#D4AF37]" strokeWidth={2} />
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                className="absolute -top-1 -right-1 w-3 h-3 bg-[#D4AF37] rounded-full blur-sm"
-              />
+              <div className="absolute inset-0 bg-[#D97706]/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+              <Coffee className="w-7 h-7 text-[#D97706] relative z-10" strokeWidth={1.5} />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-[#D4AF37] tracking-tight">
-                MoodBrewer
+              <h1 className="text-xl font-bold text-[#FAF5F0] tracking-tight">
+                MOODBREWER
               </h1>
-              <p className="text-xs text-[#F5E6D3]/60 tracking-widest">
-                AI COFFEE CURATOR
+              <p className="text-[10px] text-[#E8E3DE]/40 tracking-[0.2em] uppercase">
+                AI CURATOR
               </p>
             </div>
           </motion.div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-12">
             {navItems.map((item, index) => (
               <motion.a
                 key={item.name}
                 href={item.href}
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
                 transition={{ delay: index * 0.1 }}
-                whileHover={{ scale: 1.1 }}
-                className="text-[#F5E6D3] hover:text-[#D4AF37] transition-colors duration-300 font-medium"
+                whileHover={{ y: -2 }}
+                className="text-sm text-[#E8E3DE]/70 hover:text-[#D97706] transition-colors duration-300 font-medium tracking-wide uppercase"
               >
                 {item.name}
               </motion.a>
             ))}
             <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="bg-[#D4AF37] text-[#1A1110] px-6 py-2 rounded-full font-semibold hover:shadow-lg hover:shadow-[#D4AF37]/30 transition-all duration-300"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="px-6 py-2.5 bg-[#D97706] text-[#0A0A0A] text-sm font-semibold rounded-sm hover:bg-[#F59E0B] transition-colors duration-300 tracking-wide uppercase"
             >
-              Order Now
+              Begin
             </motion.button>
           </div>
-
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden text-[#F5E6D3] hover:text-[#D4AF37] transition-colors"
-          >
-            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
         </div>
       </div>
-
-      {/* Mobile Menu */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-[#592720]/95 backdrop-blur-xl border-t border-[#D4AF37]/20"
-          >
-            <div className="px-4 py-6 space-y-4">
-              {navItems.map((item) => (
-                <a
-                  key={item.name}
-                  href={item.href}
-                  className="block text-[#F5E6D3] hover:text-[#D4AF37] transition-colors duration-300 py-2 text-lg"
-                  onClick={() => setIsOpen(false)}
-                >
-                  {item.name}
-                </a>
-              ))}
-              <button className="w-full bg-[#D4AF37] text-[#1A1110] px-6 py-3 rounded-full font-semibold hover:shadow-lg hover:shadow-[#D4AF37]/30 transition-all duration-300">
-                Order Now
-              </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </motion.nav>
   );
 }
