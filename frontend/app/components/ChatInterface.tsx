@@ -3,7 +3,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
-import { Loader2, Clock, Brain, Coffee, Thermometer, Zap, ChevronRight } from "lucide-react";
+import { Loader2, Clock, Brain, Coffee, Thermometer, Zap, ChevronRight, Sparkles } from "lucide-react";
 
 const MENU_META = {
   moods: [
@@ -100,7 +100,19 @@ export default function ChatInterface() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-20">
+    <div className="max-w-6xl mx-auto px-6 py-20 relative">
+      {/* Background Glow */}
+      <div className="absolute inset-0 -z-10">
+        <motion.div
+          animate={{
+            scale: [1, 1.1, 1],
+            opacity: [0.1, 0.2, 0.1],
+          }}
+          transition={{ duration: 8, repeat: Infinity }}
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-[#D97706]/20 to-[#F59E0B]/20 rounded-full blur-3xl"
+        />
+      </div>
+
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -108,18 +120,32 @@ export default function ChatInterface() {
         viewport={{ once: true }}
         className="text-center mb-16"
       >
-        <div className="inline-flex items-center gap-2 mb-6">
-          <Brain className="w-5 h-5 text-[#D97706]" />
-          <span className="text-sm text-[#E8E3DE]/60 uppercase tracking-wider">
+        <motion.div
+          initial={{ scale: 0 }}
+          whileInView={{ scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ type: "spring", delay: 0.2 }}
+          className="inline-flex items-center gap-2 mb-6 px-4 py-2 bg-gradient-to-r from-[#D97706]/20 to-[#F59E0B]/20 border border-[#D97706]/30 rounded-full backdrop-blur-sm"
+        >
+          <motion.div
+            animate={{ rotate: [0, 360] }}
+            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          >
+            <Brain className="w-5 h-5 text-[#D97706]" />
+          </motion.div>
+          <span className="text-sm text-[#E8E3DE]/80 uppercase tracking-wider font-medium">
             AI Recommendation Engine
           </span>
-        </div>
-        <h2 className="text-5xl md:text-6xl font-bold text-[#FAF5F0] mb-4">
+          <Sparkles className="w-4 h-4 text-[#F59E0B]" />
+        </motion.div>
+        <h2 className="text-5xl md:text-7xl font-bold text-[#FAF5F0] mb-6">
           Configure Your
           <br />
-          <span className="text-[#D97706]">Preference Matrix</span>
+          <span className="bg-gradient-to-r from-[#D97706] via-[#F59E0B] to-[#D97706] bg-clip-text text-transparent">
+            Preference Matrix
+          </span>
         </h2>
-        <p className="text-lg text-[#E8E3DE]/60 max-w-2xl mx-auto">
+        <p className="text-lg md:text-xl text-[#E8E3DE]/70 max-w-2xl mx-auto">
           Define your parameters. Our algorithm will compute the optimal match.
         </p>
       </motion.div>
@@ -129,8 +155,12 @@ export default function ChatInterface() {
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        className="bg-[#1A1A1A] border border-[#D97706]/20 rounded-sm p-8 md:p-12 space-y-12"
+        className="bg-gradient-to-br from-[#1A1A1A] via-[#1A1A1A] to-[#2A2A2A] border border-[#D97706]/30 rounded-2xl p-8 md:p-12 space-y-12 shadow-2xl shadow-[#D97706]/10 relative overflow-hidden"
       >
+        {/* Decorative Elements */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-[#D97706]/5 to-transparent rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tl from-[#F59E0B]/5 to-transparent rounded-full blur-3xl" />
+
         {/* Mood Section */}
         <Section 
           title="01. MOOD STATE" 
@@ -160,15 +190,23 @@ export default function ChatInterface() {
               <motion.button
                 key={t}
                 onClick={() => setTime(t)}
-                whileHover={{ scale: 1.02, y: -2 }}
-                whileTap={{ scale: 0.98 }}
-                className={`py-4 px-6 rounded-sm font-medium text-sm transition-all duration-200 uppercase tracking-wide ${
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+                className={`py-4 px-6 rounded-xl font-medium text-sm transition-all duration-200 uppercase tracking-wide relative overflow-hidden ${
                   time === t
-                    ? "bg-[#D97706] text-[#0A0A0A] border border-[#D97706]"
-                    : "bg-[#2A2A2A] border border-[#D97706]/20 text-[#E8E3DE] hover:border-[#D97706]/40"
+                    ? "bg-gradient-to-r from-[#D97706] to-[#F59E0B] text-[#0A0A0A] border-2 border-[#D97706] shadow-lg shadow-[#D97706]/30"
+                    : "bg-[#2A2A2A] border-2 border-[#D97706]/20 text-[#E8E3DE] hover:border-[#D97706]/50 hover:bg-[#2A2A2A]/80"
                 }`}
               >
-                {labelize(t)}
+                {time === t && (
+                  <motion.div
+                    layoutId="timeButton"
+                    className="absolute inset-0 bg-gradient-to-r from-[#D97706] to-[#F59E0B]"
+                    initial={false}
+                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                  />
+                )}
+                <span className="relative z-10">{labelize(t)}</span>
               </motion.button>
             ))}
           </div>
@@ -186,15 +224,23 @@ export default function ChatInterface() {
                 <motion.button
                   key={temp}
                   onClick={() => setTemperature(temp)}
-                  whileHover={{ scale: 1.02, y: -2 }}
-                  whileTap={{ scale: 0.98 }}
-                  className={`py-4 px-6 rounded-sm font-medium text-sm transition-all duration-200 uppercase tracking-wide ${
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  className={`py-4 px-6 rounded-xl font-medium text-sm transition-all duration-200 uppercase tracking-wide relative overflow-hidden ${
                     temperature === temp
-                      ? "bg-[#D97706] text-[#0A0A0A] border border-[#D97706]"
-                      : "bg-[#2A2A2A] border border-[#D97706]/20 text-[#E8E3DE] hover:border-[#D97706]/40"
+                      ? "bg-gradient-to-r from-[#D97706] to-[#F59E0B] text-[#0A0A0A] border-2 border-[#D97706] shadow-lg shadow-[#D97706]/30"
+                      : "bg-[#2A2A2A] border-2 border-[#D97706]/20 text-[#E8E3DE] hover:border-[#D97706]/50"
                   }`}
                 >
-                  {labelize(temp)}
+                  {temperature === temp && (
+                    <motion.div
+                      layoutId="tempButton"
+                      className="absolute inset-0 bg-gradient-to-r from-[#D97706] to-[#F59E0B]"
+                      initial={false}
+                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    />
+                  )}
+                  <span className="relative z-10">{labelize(temp)}</span>
                 </motion.button>
               ))}
             </div>
@@ -210,15 +256,23 @@ export default function ChatInterface() {
                 <motion.button
                   key={caf}
                   onClick={() => setCaffeine(caf)}
-                  whileHover={{ scale: 1.02, y: -2 }}
-                  whileTap={{ scale: 0.98 }}
-                  className={`py-4 px-3 rounded-sm font-medium text-xs transition-all duration-200 uppercase tracking-wide ${
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  className={`py-4 px-3 rounded-xl font-medium text-xs transition-all duration-200 uppercase tracking-wide relative overflow-hidden ${
                     caffeine === caf
-                      ? "bg-[#D97706] text-[#0A0A0A] border border-[#D97706]"
-                      : "bg-[#2A2A2A] border border-[#D97706]/20 text-[#E8E3DE] hover:border-[#D97706]/40"
+                      ? "bg-gradient-to-r from-[#D97706] to-[#F59E0B] text-[#0A0A0A] border-2 border-[#D97706] shadow-lg shadow-[#D97706]/30"
+                      : "bg-[#2A2A2A] border-2 border-[#D97706]/20 text-[#E8E3DE] hover:border-[#D97706]/50"
                   }`}
                 >
-                  {labelize(caf)}
+                  {caffeine === caf && (
+                    <motion.div
+                      layoutId="caffeineButton"
+                      className="absolute inset-0 bg-gradient-to-r from-[#D97706] to-[#F59E0B]"
+                      initial={false}
+                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    />
+                  )}
+                  <span className="relative z-10">{labelize(caf)}</span>
                 </motion.button>
               ))}
             </div>
@@ -229,10 +283,10 @@ export default function ChatInterface() {
         <AnimatePresence>
           {error && (
             <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="bg-[#2A1A0A] border border-[#D97706]/40 rounded-sm p-4 text-[#D97706] text-sm"
+              initial={{ opacity: 0, y: -10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.95 }}
+              className="bg-gradient-to-r from-[#2A1A0A] to-[#3D2817] border-2 border-[#D97706]/50 rounded-xl p-4 text-[#D97706] text-sm backdrop-blur-sm"
             >
               {error}
             </motion.div>
@@ -243,44 +297,60 @@ export default function ChatInterface() {
         <motion.button
           onClick={send}
           disabled={loading || !mood || !taste}
-          whileHover={{ scale: loading ? 1 : 1.01 }}
-          whileTap={{ scale: loading ? 1 : 0.99 }}
-          className="w-full bg-[#D97706] text-[#0A0A0A] font-bold text-lg py-5 rounded-sm flex items-center justify-center gap-3 hover:bg-[#F59E0B] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider"
+          whileHover={{ scale: loading ? 1 : 1.02, y: -2 }}
+          whileTap={{ scale: loading ? 1 : 0.98 }}
+          className="w-full bg-gradient-to-r from-[#D97706] via-[#F59E0B] to-[#D97706] text-[#0A0A0A] font-bold text-lg py-6 rounded-xl flex items-center justify-center gap-3 hover:shadow-2xl hover:shadow-[#D97706]/40 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider relative overflow-hidden group"
         >
-          {loading ? (
-            <>
-              <Loader2 className="animate-spin w-5 h-5" />
-              <span>Processing...</span>
-            </>
-          ) : (
-            <>
-              <span>Compute Recommendation</span>
-              <ChevronRight className="w-5 h-5" />
-            </>
-          )}
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-[#F59E0B] via-[#D97706] to-[#F59E0B]"
+            animate={{
+              backgroundPosition: ["0%", "100%", "0%"],
+            }}
+            transition={{ duration: 3, repeat: Infinity }}
+            style={{ backgroundSize: "200% 100%" }}
+          />
+          <span className="relative z-10 flex items-center gap-3">
+            {loading ? (
+              <>
+                <Loader2 className="animate-spin w-5 h-5" />
+                <span>Processing...</span>
+              </>
+            ) : (
+              <>
+                <span>Compute Recommendation</span>
+                <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </>
+            )}
+          </span>
         </motion.button>
 
         {/* Response Card */}
         <AnimatePresence>
           {reply && (
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -30 }}
+              initial={{ opacity: 0, y: 30, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -30, scale: 0.95 }}
               transition={{ type: "spring", duration: 0.6 }}
-              className="mt-8 border-t border-[#D97706]/20 pt-8"
+              className="mt-8 border-t-2 border-[#D97706]/30 pt-8"
             >
-              <div className="bg-[#2A2A2A] border border-[#D97706]/30 rounded-sm p-8">
-                <div className="flex items-start gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-[#D97706] rounded-sm flex items-center justify-center">
-                    <Coffee className="w-6 h-6 text-[#0A0A0A]" strokeWidth={1.5} />
-                  </div>
+              <div className="bg-gradient-to-br from-[#2A2A2A] via-[#1A1A1A] to-[#2A2A2A] border-2 border-[#D97706]/40 rounded-2xl p-8 shadow-2xl shadow-[#D97706]/20 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-[#D97706]/10 rounded-full blur-2xl" />
+                <div className="flex items-start gap-6 relative z-10">
+                  <motion.div
+                    initial={{ scale: 0, rotate: -180 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ type: "spring", delay: 0.2 }}
+                    className="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-[#D97706] to-[#F59E0B] rounded-xl flex items-center justify-center shadow-lg shadow-[#D97706]/30"
+                  >
+                    <Coffee className="w-8 h-8 text-[#0A0A0A]" strokeWidth={1.5} />
+                  </motion.div>
                   <div className="flex-1 space-y-4">
                     <div>
-                      <div className="text-xs text-[#D97706] uppercase tracking-wider mb-2">
+                      <div className="text-xs text-[#D97706] uppercase tracking-wider mb-2 font-semibold">
                         Recommended
                       </div>
-                      <h3 className="text-3xl md:text-4xl font-bold text-[#FAF5F0] mb-3">
+                      <h3 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-[#FAF5F0] to-[#E8E3DE] bg-clip-text text-transparent mb-3">
                         {reply.recommendation}
                       </h3>
                     </div>
@@ -289,11 +359,11 @@ export default function ChatInterface() {
                     </p>
                     {reply.price && (
                       <div className="pt-4 border-t border-[#D97706]/20">
-                        <div className="flex items-baseline gap-2">
+                        <div className="flex items-baseline gap-3">
                           <span className="text-sm text-[#E8E3DE]/60 uppercase tracking-wider">
                             Price
                           </span>
-                          <span className="text-2xl font-bold text-[#D97706]">
+                          <span className="text-3xl font-bold bg-gradient-to-r from-[#D97706] to-[#F59E0B] bg-clip-text text-transparent">
                             ₹{reply.price}
                           </span>
                         </div>
@@ -322,9 +392,19 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <div className="space-y-4">
+    <motion.div
+      initial={{ opacity: 0, x: -20 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true }}
+      className="space-y-4"
+    >
       <div className="flex items-center gap-3 mb-6">
-        <div className="text-[#D97706]">{icon}</div>
+        <motion.div
+          whileHover={{ scale: 1.1, rotate: 5 }}
+          className="text-[#D97706]"
+        >
+          {icon}
+        </motion.div>
         <div>
           <h3 className="text-sm font-bold text-[#FAF5F0] uppercase tracking-wider">
             {title}
@@ -333,10 +413,10 @@ function Section({
             <p className="text-xs text-[#E8E3DE]/50 mt-1">{subtitle}</p>
           )}
         </div>
-        <div className="flex-1 h-px bg-gradient-to-r from-[#D97706]/20 to-transparent ml-4" />
+        <div className="flex-1 h-px bg-gradient-to-r from-[#D97706]/30 via-[#F59E0B]/30 to-transparent ml-4" />
       </div>
       {children}
-    </div>
+    </motion.div>
   );
 }
 
@@ -350,23 +430,31 @@ function ChipGroup({
   onChange: (v: string) => void;
 }) {
   return (
-    <div className="flex flex-wrap gap-2.5">
+    <div className="flex flex-wrap gap-3">
       {items.map((item, index) => (
         <motion.button
           key={item}
           onClick={() => onChange(item)}
-          initial={{ opacity: 0, scale: 0.9 }}
+          initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: index * 0.01 }}
-          whileHover={{ scale: 1.02, y: -2 }}
-          whileTap={{ scale: 0.98 }}
-          className={`px-5 py-2.5 rounded-sm text-sm font-medium transition-all duration-200 uppercase tracking-wide ${
+          transition={{ delay: index * 0.02, type: "spring" }}
+          whileHover={{ scale: 1.05, y: -2 }}
+          whileTap={{ scale: 0.95 }}
+          className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 uppercase tracking-wide relative overflow-hidden ${
             value === item
-              ? "bg-[#D97706] text-[#0A0A0A] border border-[#D97706]"
-              : "bg-[#2A2A2A] border border-[#D97706]/20 text-[#E8E3DE] hover:border-[#D97706]/40"
+              ? "bg-gradient-to-r from-[#D97706] to-[#F59E0B] text-[#0A0A0A] border-2 border-[#D97706] shadow-lg shadow-[#D97706]/30"
+              : "bg-[#2A2A2A] border-2 border-[#D97706]/20 text-[#E8E3DE] hover:border-[#D97706]/50 hover:bg-[#2A2A2A]/80"
           }`}
         >
-          {labelize(item)}
+          {value === item && (
+            <motion.div
+              layoutId="selectedChip"
+              className="absolute inset-0 bg-gradient-to-r from-[#D97706] to-[#F59E0B]"
+              initial={false}
+              transition={{ type: "spring", stiffness: 500, damping: 30 }}
+            />
+          )}
+          <span className="relative z-10">{labelize(item)}</span>
         </motion.button>
       ))}
     </div>
