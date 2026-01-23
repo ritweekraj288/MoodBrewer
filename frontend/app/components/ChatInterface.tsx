@@ -3,7 +3,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, Loader2, Clock, Heart, Coffee } from "lucide-react";
+import { Sparkles, Loader2, Clock, Heart, Coffee, Thermometer, Zap } from "lucide-react";
 
 /* ---------- Hard-coded MENU META ---------- */
 const MENU_META = {
@@ -66,27 +66,39 @@ export default function ChatInterface() {
   const [mood, setMood] = useState("");
   const [taste, setTaste] = useState("");
   const [time, setTime] = useState("evening");
+  const [temperature, setTemperature] = useState("cold");
+  const [caffeine, setCaffeine] = useState("medium");
   const [reply, setReply] = useState<Reply | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function send() {
-    if (!mood || !taste) return;
+    if (!mood || !taste) {
+      setError("Please select both mood and taste preferences");
+      return;
+    }
 
     try {
       setLoading(true);
       setReply(null);
+      setError(null);
 
-      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/chat`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const res = await axios.post(`${apiUrl}/chat`, {
         mood,
         taste,
         time,
-        temperature: "cold",
-        caffeine: "medium",
+        temperature,
+        caffeine,
       });
 
       setReply(res.data);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      setError(
+        err.response?.data?.detail || 
+        "Unable to connect to the server. Please ensure the backend is running."
+      );
     } finally {
       setLoading(false);
     }
@@ -160,25 +172,98 @@ export default function ChatInterface() {
           </div>
         </Section>
 
+        {/* Temperature Section */}
+        <Section title="Temperature preference" icon={<Thermometer className="w-4 h-4" />}>
+          <div className="grid grid-cols-2 gap-3 max-w-md">
+            {["hot", "cold"].map((temp) => (
+              <motion.button
+                key={temp}
+                onClick={() => setTemperature(temp)}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className={`py-3 px-6 rounded-xl font-medium text-sm transition-all duration-300 ${
+                  temperature === temp
+                    ? "bg-[#D4AF37] text-[#1A1110] shadow-lg shadow-[#D4AF37]/30 border-2 border-[#D4AF37]"
+                    : "bg-[#592720]/30 border-2 border-[#D4AF37]/20 text-[#F5E6D3] hover:border-[#D4AF37]/50 hover:bg-[#592720]/50"
+                }`}
+              >
+                {labelize(temp)}
+              </motion.button>
+            ))}
+          </div>
+        </Section>
+
+        {/* Caffeine Section */}
+        <Section title="Caffeine level" icon={<Zap className="w-4 h-4" />}>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl">
+            {["none", "low", "medium", "high"].map((caf) => (
+              <motion.button
+                key={caf}
+                onClick={() => setCaffeine(caf)}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className={`py-3 px-4 rounded-xl font-medium text-sm transition-all duration-300 ${
+                  caffeine === caf
+                    ? "bg-[#D4AF37] text-[#1A1110] shadow-lg shadow-[#D4AF37]/30 border-2 border-[#D4AF37]"
+                    : "bg-[#592720]/30 border-2 border-[#D4AF37]/20 text-[#F5E6D3] hover:border-[#D4AF37]/50 hover:bg-[#592720]/50"
+                }`}
+              >
+                {labelize(caf)}
+              </motion.button>
+            ))}
+          </div>
+        </Section>
+
+        {/* Error Message */}
+        <AnimatePresence>
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="bg-red-500/20 border-2 border-red-500/50 rounded-xl p-4 text-red-200 text-sm"
+            >
+              {error}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Submit Button */}
         <motion.button
           onClick={send}
           disabled={loading || !mood || !taste}
           whileHover={{ scale: loading ? 1 : 1.02 }}
           whileTap={{ scale: loading ? 1 : 0.98 }}
-          className="w-full bg-gradient-to-r from-[#D4AF37] via-[#926644] to-[#D4AF37] text-[#1A1110] font-bold text-lg py-4 rounded-xl flex items-center justify-center gap-3 hover:shadow-2xl hover:shadow-[#D4AF37]/40 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-gradient-to-r from-[#D4AF37] via-[#926644] to-[#D4AF37] text-[#1A1110] font-bold text-lg py-4 rounded-xl flex items-center justify-center gap-3 hover:shadow-2xl hover:shadow-[#D4AF37]/40 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group"
         >
-          {loading ? (
-            <>
-              <Loader2 className="animate-spin w-6 h-6" />
-              <span>Crafting Your Perfect Cup...</span>
-            </>
-          ) : (
-            <>
-              <Sparkles className="w-6 h-6" />
-              <span>Get My Recommendation</span>
-            </>
-          )}
+          {/* Animated background gradient */}
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-[#926644] via-[#D4AF37] to-[#926644] opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+            animate={{
+              backgroundPosition: ["0%", "100%"],
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              repeatType: "reverse",
+            }}
+            style={{
+              backgroundSize: "200% 100%",
+            }}
+          />
+          <span className="relative z-10 flex items-center gap-3">
+            {loading ? (
+              <>
+                <Loader2 className="animate-spin w-6 h-6" />
+                <span>Crafting Your Perfect Cup...</span>
+              </>
+            ) : (
+              <>
+                <Sparkles className="w-6 h-6" />
+                <span>Get My Recommendation</span>
+              </>
+            )}
+          </span>
         </motion.button>
 
         {/* Response Card */}
@@ -267,19 +352,30 @@ function ChipGroup({
 }) {
   return (
     <div className="flex flex-wrap gap-2.5">
-      {items.map((item) => (
+      {items.map((item, index) => (
         <motion.button
           key={item}
           onClick={() => onChange(item)}
-          whileHover={{ scale: 1.05 }}
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: index * 0.02, type: "spring", stiffness: 200 }}
+          whileHover={{ scale: 1.05, y: -2 }}
           whileTap={{ scale: 0.95 }}
-          className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+          className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 relative overflow-hidden ${
             value === item
               ? "bg-[#F5E6D3] text-[#1A1110] shadow-lg shadow-[#F5E6D3]/20 border-2 border-[#F5E6D3]"
               : "bg-[#592720]/30 border-2 border-[#D4AF37]/20 text-[#F5E6D3] hover:border-[#D4AF37]/50 hover:bg-[#592720]/50"
           }`}
         >
-          {labelize(item)}
+          {value === item && (
+            <motion.div
+              layoutId="selectedChip"
+              className="absolute inset-0 bg-[#F5E6D3] rounded-full"
+              initial={false}
+              transition={{ type: "spring", stiffness: 500, damping: 30 }}
+            />
+          )}
+          <span className="relative z-10">{labelize(item)}</span>
         </motion.button>
       ))}
     </div>
